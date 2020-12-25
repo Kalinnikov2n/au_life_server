@@ -1,5 +1,6 @@
 import * as express from 'express'
 import * as http from 'http'
+import { socktEventListener } from './socketEvents/index'
 import { addUser, users } from './mocks/users'
 // import * as io from 'socket.io'
 const dotenv = require('dotenv')
@@ -22,12 +23,7 @@ const corsMiddleware = (req, res, next) => {
   res.header('Access-Control-Allow-Credentials', 'true')
   next()
 }
-socket.on('connection', (connection) => {
-  connection.on('init', function (msg) {
-    addUser()
-    socket.emit('newUser', { users: users })
-  })
-})
+socket.on('connection', (connection) => socktEventListener(connection, socket))
 app.use(corsMiddleware)
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
